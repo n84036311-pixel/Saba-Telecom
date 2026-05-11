@@ -1,27 +1,36 @@
-<!DOCTYPE html>
+</html><!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="pageTitleTag">Milon Sell BD</title>
+    <title id="pageTitleTag">SabaTelecom</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         ::-webkit-scrollbar { width: 0px; background: transparent; }
         .hide-scroll::-webkit-scrollbar { display: none; }
         .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .marquee-wrapper { width: 100%; overflow: hidden; white-space: nowrap; display: flex; align-items: center; }
+        .marquee-text { display: inline-block; padding-left: 100%; animation: marquee-scroll 12s linear infinite; }
+        @keyframes marquee-scroll { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
     </style>
 </head>
-<body class="bg-gray-100 flex justify-center">
+<body class="bg-gray-100 flex justify-center font-sans">
 
-    <div class="w-full max-w-md bg-white min-h-screen relative shadow-lg overflow-x-hidden pb-6">
+    <div class="w-full max-w-md bg-white min-h-screen relative shadow-lg overflow-x-hidden pb-6 flex flex-col">
         
+        <!-- Scrolling Banner -->
+        <div id="marqueeContainer" class="marquee-wrapper bg-blue-700 text-white text-[13px] py-1.5 hidden z-50 relative">
+            <div id="marqueeText" class="marquee-text font-medium tracking-wide"></div>
+        </div>
+
         <!-- Header -->
         <header class="bg-white sticky top-0 z-40 border-b shadow-sm">
             <div class="flex justify-between items-center p-3">
-                <div class="flex items-center gap-2 cursor-pointer" onclick="closeProductModal()">
-                    <img id="headerLogo" src="https://cdn-icons-png.flaticon.com/512/1162/1162499.png" class="w-8 h-8 object-contain">
-                    <h1 id="headerTitle" class="font-bold text-lg text-black">milonsell.com</h1>
+                <div class="flex items-center gap-2 cursor-pointer" onclick="goHome()">
+                    <img id="headerLogo" src="" class="w-8 h-8 object-contain rounded-full hidden">
+                    <h1 id="headerTitle" class="font-bold text-lg text-black"></h1>
                 </div>
                 
                 <div class="flex items-center gap-3 text-gray-700">
@@ -37,7 +46,12 @@
                 </div>
             </div>
             
-            <div class="px-4 pb-3" id="searchBarContainer">
+            <!-- Large Site Name -->
+            <div class="px-4 pt-3 pb-2 bg-white" id="largeTitleContainer">
+                <h2 id="largeSiteName" class="text-[22px] font-bold text-gray-800"></h2>
+            </div>
+
+            <div class="px-4 pb-3 bg-white" id="searchBarContainer">
                 <div class="flex items-center bg-gray-50 rounded-lg p-1 border border-gray-200 focus-within:border-blue-400 transition">
                     <input type="text" id="searchInput" placeholder="পণ্য খুঁজুন..." class="bg-transparent w-full outline-none px-3 text-sm">
                     <button class="bg-blue-600 text-white px-4 py-1.5 rounded-md"><i class="fa-solid fa-magnifying-glass"></i></button>
@@ -49,27 +63,34 @@
         <div id="adsterra-banner-container" class="w-full flex justify-center bg-gray-50 border-b hidden"></div>
 
         <!-- Categories & Products List -->
-        <div id="mainContentArea">
+        <div id="mainContentArea" class="bg-white">
             <div class="px-4 py-3 flex gap-3 overflow-x-auto border-b hide-scroll" id="categoryContainer"></div>
             <div class="px-4 py-3 flex justify-between items-center text-sm text-gray-600">
-                <span id="lang-allProd" class="font-bold text-black">All Products</span>
+                <span id="lang-allProd" class="font-bold text-black text-base">All Products</span>
                 <select class="border border-gray-300 p-1 rounded bg-white outline-none focus:border-blue-500"><option>Default</option></select>
             </div>
             <div class="grid grid-cols-2 gap-3 p-4 bg-gray-50" id="productContainer"></div>
         </div>
 
-        <!-- PRODUCT DETAILS MODAL -->
-        <div id="productModal" class="fixed inset-0 bg-white z-[45] hidden flex-col overflow-y-auto pb-20 w-full max-w-md mx-auto shadow-xl">
-            <button onclick="closeProductModal()" class="absolute top-4 left-4 bg-white/90 w-10 h-10 rounded-full flex justify-center items-center text-black shadow-md z-50 hover:bg-gray-200 transition"><i class="fa-solid fa-arrow-left text-xl"></i></button>
+        <!-- PRODUCT DETAILS VIEW -->
+        <div id="productDetailsView" class="hidden w-full bg-white pb-10 flex-col">
             
-            <div class="w-full bg-gray-100 flex justify-center items-center overflow-hidden">
-                <img id="pdMainImg" src="" onerror="this.src='https://placehold.co/400x400?text=No+Image'" class="w-full h-80 object-cover shadow-sm transition-opacity duration-300">
+            <div class="sticky top-0 z-50 bg-white border-b shadow-sm p-3 flex items-center w-full">
+                <button onclick="goHome()" class="text-gray-700 text-xl hover:text-red-500 transition px-3"><i class="fa-solid fa-arrow-left"></i></button>
+                <div class="flex items-center gap-2 cursor-pointer ml-1" onclick="goHome()">
+                    <img id="pdModalLogo" src="" class="w-8 h-8 object-contain rounded-full hidden">
+                    <h1 id="pdModalSiteName" class="font-bold text-lg text-black"></h1>
+                </div>
+            </div>
+
+            <div class="w-full bg-gray-50 flex justify-center items-center py-4 border-b overflow-hidden">
+                <img id="pdMainImg" src="" onerror="this.src='https://placehold.co/400x400?text=No+Image'" class="w-full h-[320px] object-contain transition-opacity duration-300 mix-blend-multiply">
             </div>
 
             <div class="px-5 mt-4 flex gap-2 overflow-x-auto hide-scroll" id="pdThumbnails"></div>
 
             <div class="p-5">
-                <h2 id="pdName" class="text-xl font-bold text-black leading-tight mb-2"></h2>
+                <h2 id="pdName" class="text-[22px] font-bold text-black leading-tight mb-2"></h2>
                 
                 <div class="flex items-center gap-3 mb-4">
                     <span id="pdPrice" class="text-2xl font-bold text-black"></span>
@@ -102,7 +123,7 @@
         </a>
 
         <!-- Cart Modal -->
-        <div id="cartModal" class="fixed inset-0 bg-black bg-opacity-60 z-[50] hidden flex justify-center items-end">
+        <div id="cartModal" class="fixed inset-0 bg-black bg-opacity-60 z-[60] hidden flex justify-center items-end">
             <div class="w-full max-w-md bg-white rounded-t-2xl h-[90vh] overflow-y-auto p-5 relative">
                 <button onclick="toggleCart()" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-2xl"><i class="fa-solid fa-circle-xmark"></i></button>
                 <h2 id="lang-cartTitle" class="text-2xl font-bold mb-4 text-blue-800">অর্ডার করুন</h2>
@@ -166,7 +187,7 @@
             </div>
         </div>
 
-        <div id="successModal" class="fixed inset-0 bg-black bg-opacity-70 z-[60] hidden flex justify-center items-center">
+        <div id="successModal" class="fixed inset-0 bg-black bg-opacity-70 z-[70] hidden flex justify-center items-center">
             <div class="bg-white rounded-2xl p-8 w-11/12 max-w-sm text-center shadow-2xl transform transition-all">
                 <div class="text-green-500 text-7xl mb-4"><i class="fa-solid fa-circle-check"></i></div>
                 <h2 id="successTitle" class="text-2xl font-bold text-black mb-2">অর্ডার সফল হয়েছে!</h2>
@@ -177,10 +198,10 @@
 
     </div>
 
-    <!-- 🔥 FIRESTORE LOGIC & ADSTERRA INJECTION 🔥 -->
+    <!-- 🔥 FIREBASE & ADSTERRA AUTO UPDATER 🔥 -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, addDoc, doc, getDoc, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, addDoc, doc, getDoc, updateDoc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBH-6iF4Nh3ctxNQ9uTav4ZJJJPHMTFvkM",
@@ -197,100 +218,120 @@
         let products = []; let categories = []; let cart = [];
         let settings = { delivery: 150, vat: 0, whatsapp: "" };
         let activeProduct = null; let selectedColor = ""; let activeVariantsData = []; 
+        let activeCategoryId = 'all';
+        let currentLoadedAdKey = ""; // Track current ad to prevent infinite reloading
 
         let currentLang = 'bn';
         const langData = {
             bn: { search: "পণ্য খুঁজুন...", allProd: "All Products", cartTitle: "অর্ডার করুন", subTotal: "সাব টোটাল", delCharge: "ডেলিভারি চার্জ", grandTotal: "সর্বমোট", contactTitle: "Contact", phoneLabel: "আপনার ফোন নাম্বার", personalInfo: "ব্যক্তিগত তথ্য", nameLabel: "আপনার নাম", addressLabel: "আপনার ঠিকানা", payOptTitle: "পেমেন্ট অপশন", payFull: "পূর্ণ মূল্য পরিশোধ করুন", payAdv: "এডভান্স টাকা", payInst: "বিকাশ/নগদ পেমেন্ট নির্দেশনা", senderLabel: "যে নম্বর থেকে টাকা পাঠিয়েছেন", trxLabel: "TrxID (ট্রানজেকশন আইডি)", confirmBtn: "অর্ডার কনফার্ম করুন", orderNow: "অর্ডার করুন", addCart: "কার্টে যোগ করুন", stockOut: "Stock Out", orderSummaryTitle: "অর্ডার সামারি", successTitle: "অর্ডার সফল হয়েছে!", successDesc: "হোয়াটসঅ্যাপে নিয়ে যাওয়া হচ্ছে...", stockLimit: "দুঃখিত, পর্যাপ্ত পণ্য স্টকে নেই।", colorTxt: "কালার সিলেক্ট করুন", detailsTxt: "বিস্তারিত তথ্য:" },
-            en: { search: "Search...", allProd: "All Products", cartTitle: "Place order", subTotal: "Sub Total", delCharge: "Delivery Charge", grandTotal: "Grand Total", contactTitle: "Contact", phoneLabel: "Phone number", personalInfo: "Personal Info", nameLabel: "Full Name", addressLabel: "Address", payOptTitle: "Payment options", payFull: "Pay Full Amount", payAdv: "Advance Payment", payInst: "Payment instruction", senderLabel: "Sender Phone Number", trxLabel: "TrxID (Transaction ID)", confirmBtn: "Confirm Order", orderNow: "Order Now", addCart: "Add to Cart", stockOut: "Stock Out", orderSummaryTitle: "Order Summary", successTitle: "Order Successful!", successDesc: "Redirecting to WhatsApp...", stockLimit: "Sorry, not enough items in stock.", colorTxt: "Select Color", detailsTxt: "Product Details:" }
+            en: { search: "Search...", allProd: "All Products", cartTitle: "Place order", subTotal: "Sub Total", delCharge: "Delivery Charge", grandTotal: "Grand Total", contactTitle: "Contact", phoneLabel: "Phone number", personalInfo: "Personal Info", nameLabel: "Full Name", addressLabel: "Address", payOptTitle: "Payment options", payFull: "Pay Full Amount", payAdv: "Advance Payment", payInst: "Payment instruction (Send money)", senderLabel: "Sender Phone Number", trxLabel: "TrxID (Transaction ID)", confirmBtn: "Confirm Order", orderNow: "Order Now", addCart: "Add to Cart", stockOut: "Stock Out", orderSummaryTitle: "Order Summary", successTitle: "Order Successful!", successDesc: "Redirecting to WhatsApp...", stockLimit: "Sorry, not enough items in stock.", colorTxt: "Select Color", detailsTxt: "Product Details:" }
         };
 
-        window.toggleLanguage = () => {
-            currentLang = currentLang === 'bn' ? 'en' : 'bn';
-            document.getElementById('langText').innerText = currentLang.toUpperCase();
+        window.applyLanguage = () => {
+            document.getElementById('langText').innerText = currentLang === 'bn' ? 'EN' : 'BN';
             let d = langData[currentLang];
             ['searchInput','cPhone','cName','cAddress','senderNum','trxId'].forEach(id => { let el = document.getElementById(id); if(el) { if(id === 'searchInput') el.placeholder = d.search; else if(id === 'cPhone' || id === 'senderNum') el.placeholder = ""; else if(id === 'cName') el.placeholder = d.nameLabel; else if(id === 'cAddress') el.placeholder = d.addressLabel; else if(id === 'trxId') el.placeholder = d.trxLabel; } });
             ['lang-allProd','lang-cartTitle','lang-subTotal','lang-delCharge','lang-grandTotal','lang-contactTitle','lang-phoneLabel','lang-personalInfo','lang-nameLabel','lang-addressLabel','lang-payOptTitle','lang-payFull','lang-payAdv','lang-payInst','lang-senderLabel','lang-trxLabel','lang-confirmBtn','lang-orderSummaryTitle', 'lang-colorTxt', 'lang-detailsTxt'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).innerText = d[id.replace('lang-', '')]; });
             renderProducts(products); updateCartUI(); if(activeProduct) openProductModal(activeProduct.id);
         };
-        
-        // Load Ads From DB
-        async function loadAdsFromFirestore() {
-            try {
-                const adRef = doc(db, "settings", "ad_settings");
-                const adSnap = await getDoc(adRef);
 
-                let defaultBanner = `<script>atOptions={'key':'3988852ddc2607499411d12416076938','format':'iframe','height':50,'width':320,'params':{}};</scr`+`ipt><script src="https://www.highperformanceformat.com/3988852ddc2607499411d12416076938/invoke.js"></scr`+`ipt>`; 
-                let defaultSocial = `<script src="https://pl23792003.profitablecpmratenetwork.com/ac/f5/22/acf5224742b437f1b5583daa1d967138.js"></scr`+`ipt>`; 
+        window.toggleLanguage = () => {
+            currentLang = currentLang === 'bn' ? 'en' : 'bn';
+            applyLanguage();
+        };
 
-                let bCode = defaultBanner;
-                let sCode = defaultSocial;
-
-                if(adSnap.exists()) {
-                    let aData = adSnap.data();
-                    if(aData.bannerAdCode !== undefined) bCode = aData.bannerAdCode;
-                    if(aData.socialBarAdCode !== undefined) sCode = aData.socialBarAdCode;
-                } else {
-                    await setDoc(adRef, { bannerAdCode: bCode, socialBarAdCode: sCode });
-                }
-
-                // Inject Banner
-                if(bCode && bCode !== "OFF") {
+        // 🔥 REAL-TIME AD LISTENER 🔥
+        function listenToAdSettings() {
+            onSnapshot(doc(db, "settings", "ad_settings"), (docSnap) => {
+                if(docSnap.exists()) {
+                    let aData = docSnap.data();
+                    let bKey = aData.bannerKey;
+                    
                     const bannerContainer = document.getElementById('adsterra-banner-container');
-                    bannerContainer.classList.remove('hidden');
-                    const iframe = document.createElement('iframe');
-                    iframe.width = 320; iframe.height = 50; iframe.frameBorder = 0; iframe.scrolling = 'no';
-                    bannerContainer.appendChild(iframe);
-                    const docContent = iframe.contentWindow.document;
-                    docContent.open();
-                    docContent.write(`<html><head><style>body{margin:0;padding:0;display:flex;justify-content:center;}</style></head><body>${bCode}</body></html>`);
-                    docContent.close();
+                    
+                    // If Ad is turned OFF
+                    if(!bKey || bKey === "OFF") {
+                        bannerContainer.classList.add('hidden');
+                        bannerContainer.innerHTML = "";
+                        currentLoadedAdKey = "OFF";
+                    } 
+                    // If Ad Key changed or newly added
+                    else if (bKey !== currentLoadedAdKey) {
+                        currentLoadedAdKey = bKey;
+                        bannerContainer.classList.remove('hidden');
+                        bannerContainer.innerHTML = ""; // clear old
+                        const iframe = document.createElement('iframe');
+                        iframe.width = 320; iframe.height = 50; iframe.frameBorder = 0; iframe.scrolling = 'no';
+                        bannerContainer.appendChild(iframe);
+                        const docContent = iframe.contentWindow.document;
+                        docContent.open();
+                        docContent.write(`<html><body style="margin:0;padding:0;"><script>atOptions = { 'key' : '${bKey}', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };<\/script><script src="https://www.highperformanceformat.com/${bKey}/invoke.js"><\/script></body></html>`);
+                        docContent.close();
+                    }
+                    
+                    // Social bar doesn't need realtime changing without reload, but handled here just in case
+                    if(aData.socialBarSrc && aData.socialBarSrc !== "OFF" && !document.querySelector(`script[src="${aData.socialBarSrc}"]`)) {
+                        const s3 = document.createElement('script'); s3.type = "text/javascript"; s3.src = aData.socialBarSrc;
+                        document.body.appendChild(s3);
+                    }
+                } else {
+                    // Create default DB entry if doesn't exist
+                    setDoc(doc(db, "settings", "ad_settings"), { bannerKey: "OFF", socialBarSrc: "OFF" });
                 }
-                
-                // Inject Social Bar safely into DOM
-                if(sCode && sCode !== "OFF") {
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = sCode;
-                    Array.from(tempDiv.childNodes).forEach(node => {
-                        if (node.tagName === 'SCRIPT') {
-                            const script = document.createElement('script');
-                            Array.from(node.attributes).forEach(attr => script.setAttribute(attr.name, attr.value));
-                            if (node.innerHTML) script.innerHTML = node.innerHTML;
-                            document.body.appendChild(script);
-                        }
-                    });
-                }
-            } catch(e) { console.log("Ad Error:", e); }
+            });
         }
 
         async function loadData() {
             try {
-                const setDocSnap = await getDoc(doc(db, "settings", "store_settings"));
-                if(setDocSnap.exists()) {
-                    let d = setDocSnap.data();
-                    settings.delivery = Number(d.deliveryCharge) || 150; 
-                    settings.vat = parseFloat(d.vatPercentage) || 0; 
-                    
-                    document.getElementById('headerTitle').innerText = d.siteName || "milonsell.com";
-                    document.getElementById('pageTitleTag').innerText = d.siteName || "Milon Sell BD";
-                    if(d.siteLogo) document.getElementById('headerLogo').src = d.siteLogo;
+                // Settings Real-Time
+                onSnapshot(doc(db, "settings", "store_settings"), (docSnap) => {
+                    if(docSnap.exists()) {
+                        let d = docSnap.data();
+                        settings.delivery = Number(d.deliveryCharge) || 150; 
+                        settings.vat = parseFloat(d.vatPercentage) || 0; 
+                        
+                        document.getElementById('headerTitle').innerText = d.siteName || "";
+                        document.getElementById('largeSiteName').innerText = d.siteName || "";
+                        document.getElementById('pdModalSiteName').innerText = d.siteName || "";
+                        document.getElementById('pageTitleTag').innerText = d.siteName || "SabaTelecom";
 
-                    if(d.emailAddress) document.getElementById('headerEmailBtn').href = `mailto:${d.emailAddress}`;
-                    if(d.phoneNumber) document.getElementById('callBtn').href = `tel:${d.phoneNumber.replace(/[^0-9+]/g, '')}`;
-                    
-                    if(d.whatsappNumber && String(d.whatsappNumber).trim() !== "") {
-                        settings.whatsapp = String(d.whatsappNumber).replace(/[^0-9]/g, ''); 
-                        let waBtn = document.getElementById('waFloatBtn');
-                        waBtn.href = `https://wa.me/${settings.whatsapp}`; waBtn.classList.remove('hidden');
+                        if(d.siteLogo) {
+                            document.getElementById('headerLogo').src = d.siteLogo;
+                            document.getElementById('headerLogo').classList.remove('hidden');
+                            document.getElementById('pdModalLogo').src = d.siteLogo;
+                            document.getElementById('pdModalLogo').classList.remove('hidden');
+                        } else {
+                            document.getElementById('headerLogo').classList.add('hidden');
+                            document.getElementById('pdModalLogo').classList.add('hidden');
+                        }
+
+                        if(d.marqueeText && d.marqueeText.trim() !== "") {
+                            document.getElementById('marqueeText').innerText = d.marqueeText;
+                            document.getElementById('marqueeContainer').classList.remove('hidden');
+                        } else {
+                            document.getElementById('marqueeContainer').classList.add('hidden');
+                        }
+
+                        if(d.emailAddress) document.getElementById('headerEmailBtn').href = `mailto:${d.emailAddress}`;
+                        if(d.phoneNumber) document.getElementById('callBtn').href = `tel:${d.phoneNumber.replace(/[^0-9+]/g, '')}`;
+                        
+                        if(d.whatsappNumber && String(d.whatsappNumber).trim() !== "") {
+                            settings.whatsapp = String(d.whatsappNumber).replace(/[^0-9]/g, ''); 
+                            let waBtn = document.getElementById('waFloatBtn');
+                            waBtn.href = `https://wa.me/${settings.whatsapp}`; waBtn.classList.remove('hidden');
+                        }
+
+                        document.getElementById('delCharge').innerText = `${settings.delivery} BDT`;
+                        document.getElementById('advAmount').innerText = settings.delivery;
+
+                        let hasPay = false;
+                        if(d.bkash) { document.getElementById('bNumb').innerText = d.bkash; document.getElementById('bkashRow').classList.remove('hidden'); hasPay = true; }
+                        if(d.nagad) { document.getElementById('nNumb').innerText = d.nagad; document.getElementById('nagadRow').classList.remove('hidden'); hasPay = true; }
+                        if(hasPay) document.getElementById('paymentBox').classList.remove('hidden');
+                        
+                        updateCartUI(); 
                     }
-
-                    document.getElementById('delCharge').innerText = `${settings.delivery} BDT`;
-                    document.getElementById('advAmount').innerText = settings.delivery;
-
-                    let hasPay = false;
-                    if(d.bkash) { document.getElementById('bNumb').innerText = d.bkash; document.getElementById('bkashRow').classList.remove('hidden'); hasPay = true; }
-                    if(d.nagad) { document.getElementById('nNumb').innerText = d.nagad; document.getElementById('nagadRow').classList.remove('hidden'); hasPay = true; }
-                    if(hasPay) document.getElementById('paymentBox').classList.remove('hidden');
-                }
+                });
 
                 const catSnap = await getDocs(collection(db, "categories"));
                 catSnap.forEach(c => { categories.push({id: c.id, ...c.data()}); }); renderCategories();
@@ -298,16 +339,17 @@
                 const prodSnap = await getDocs(collection(db, "products"));
                 prodSnap.forEach(p => { products.push({id: p.id, ...p.data()}); }); renderProducts(products);
 
-                loadAdsFromFirestore();
+                // Load Ads dynamically
+                listenToAdSettings();
+
             } catch(e) { console.log(e); }
         }
 
-        let activeCategoryId = 'all';
         function renderCategories() {
             const catCon = document.getElementById('categoryContainer');
             catCon.innerHTML = ""; 
-            let allBorder = activeCategoryId === 'all' ? 'border-green-500 border-2 shadow-md' : 'border-gray-200 border';
-            let allText = activeCategoryId === 'all' ? 'text-green-600 font-bold' : 'text-gray-800';
+            let allBorder = activeCategoryId === 'all' ? 'border-blue-600 border-2 shadow-md' : 'border-gray-200 border';
+            let allText = activeCategoryId === 'all' ? 'text-blue-600 font-bold' : 'text-gray-800';
 
             catCon.innerHTML += `
             <div onclick="filterCat('all')" class="flex flex-col items-center cursor-pointer min-w-[70px]">
@@ -318,8 +360,8 @@
             </div>`;
 
             categories.forEach(c => {
-                let catBorder = activeCategoryId === c.id ? 'border-green-500 border-2 shadow-md' : 'border-gray-200 border';
-                let catText = activeCategoryId === c.id ? 'text-green-600 font-bold' : 'text-gray-600 font-medium';
+                let catBorder = activeCategoryId === c.id ? 'border-blue-600 border-2 shadow-md' : 'border-gray-200 border';
+                let catText = activeCategoryId === c.id ? 'text-blue-600 font-bold' : 'text-gray-600 font-medium';
 
                 catCon.innerHTML += `
                 <div onclick="filterCat('${c.id}')" class="flex flex-col items-center cursor-pointer min-w-[70px]">
@@ -351,7 +393,7 @@
                 
                 pCon.innerHTML += `
                 <div onclick="openProductModal('${p.id}')" class="bg-white border border-gray-200 rounded-xl p-3 flex flex-col items-center relative shadow-sm hover:shadow-md transition cursor-pointer">
-                    <div class="w-full h-32 flex justify-center items-center mb-2 bg-gray-50 rounded-lg overflow-hidden">
+                    <div class="w-full h-32 flex justify-center items-center mb-2 rounded-lg overflow-hidden">
                         <img src="${firstImg}" onerror="this.src='https://placehold.co/150x150?text=No+Image'" class="h-full object-contain">
                     </div>
                     <div class="flex items-center gap-2 text-sm mt-1">
@@ -414,9 +456,24 @@
 
             document.getElementById('mainContentArea').classList.add('hidden');
             document.getElementById('searchBarContainer').classList.add('hidden');
-            document.getElementById('productModal').classList.remove('hidden');
-            document.getElementById('productModal').scrollTo(0,0);
+            document.getElementById('largeTitleContainer').classList.add('hidden'); // Hide Large Title
+            document.getElementById('productDetailsView').classList.remove('hidden');
+            document.getElementById('productDetailsView').classList.add('flex');
+            window.scrollTo(0,0);
         }
+
+        window.goHome = () => {
+            document.getElementById('productDetailsView').classList.add('hidden');
+            document.getElementById('productDetailsView').classList.remove('flex');
+            document.getElementById('mainContentArea').classList.remove('hidden');
+            document.getElementById('searchBarContainer').classList.remove('hidden');
+            document.getElementById('largeTitleContainer').classList.remove('hidden'); // Show Large Title again
+            
+            activeProduct = null;
+            window.scrollTo(0,0);
+        }
+        
+        window.closeProductModal = window.goHome;
 
         window.selectColor = (colorName) => {
             selectedColor = colorName;
@@ -453,16 +510,9 @@
             let variantStock = parseInt(variant.stock) || 0; let isOut = variantStock <= 0;
             let btnHtml = isOut 
                 ? `<button disabled class="w-full bg-red-100 text-red-600 py-3 rounded-lg font-bold border border-red-200">${langData[currentLang].stockOut}</button>`
-                : `<button onclick="addModalToCart(false)" class="w-full bg-blue-50 text-blue-700 border border-blue-600 py-3 rounded-lg font-bold transition hover:bg-blue-100">${langData[currentLang].addCart}</button>
+                : `<button onclick="addModalToCart(false)" class="w-full bg-white text-blue-700 border border-blue-600 py-3 rounded-lg font-bold transition hover:bg-blue-50">${langData[currentLang].addCart}</button>
                    <button onclick="addModalToCart(true)" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold shadow-lg transition hover:bg-blue-700">${langData[currentLang].orderNow}</button>`;
             document.getElementById('pdActionButtons').innerHTML = btnHtml;
-        }
-
-        window.closeProductModal = () => {
-            document.getElementById('productModal').classList.add('hidden');
-            document.getElementById('mainContentArea').classList.remove('hidden');
-            document.getElementById('searchBarContainer').classList.remove('hidden');
-            activeProduct = null;
         }
 
         window.changePdQty = (val) => { let q = parseInt(document.getElementById('pdQty').innerText) + val; if(q < 1) q = 1; document.getElementById('pdQty').innerText = q; }
@@ -493,7 +543,7 @@
 
             if(existing) existing.qty += qty;
             else cart.push({ ...activeProduct, cartItemId: cartItemId, qty: qty, selectedColor: selectedColor, displayImg: document.getElementById('pdMainImg').src });
-            updateCartUI(); if(goCheckout) { toggleCart(); } else { closeProductModal(); alert(currentLang==='bn'?"কার্টে যুক্ত হয়েছে!":"Added to cart!");}
+            updateCartUI(); if(goCheckout) { toggleCart(); } else { alert(currentLang==='bn'?"কার্টে যুক্ত হয়েছে!":"Added to cart!");}
         }
 
         window.updateQty = (cartItemId, change) => {
@@ -601,7 +651,8 @@
                 btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> ${langData[currentLang].confirmBtn}`; btn.disabled = false;
             }
         }
-        toggleLanguage(); // Fix translation
+        
+        applyLanguage(); // Force apply Bengali on load
         loadData();
     </script>
 </body>
