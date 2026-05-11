@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="pageTitleTag">Milon Sell BD</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-gray-100 flex justify-center">
+
+    <div class="w-full max-w-md bg-white min-h-screen relative shadow-lg overflow-x-hidden pb-6">
+        
+        <!-- Header -->
+        <header class="bg-white sticky top-0 z-40 border-b shadow-sm">
+            <div class="flex justify-between items-center p-3">
+                <div class="flex items-center gap-2 cursor-pointer" onclick="closeProductModal()">
+                    <img id="headerLogo" src="https://cdn-icons-png.flaticon.com/512/1162/1162499.png" class="w-8 h-8 object-contain">
+                    <h1 id="headerTitle" class="font-bold text-lg text-black">milonsell.com</h1>
+                </div>
+                
+                <div class="flex items-center gap-3 text-gray-700">
+                    <a id="headerEmailBtn" href="#" class="hover:text-blue-600 transition"><i class="fa-regular fa-envelope text-lg"></i></a>
+                    <a id="callBtn" href="#" class="hover:text-blue-600 transition"><i class="fa-solid fa-phone text-lg"></i></a>
+                    <div onclick="toggleLanguage()" class="flex items-center gap-1 cursor-pointer text-sm font-bold hover:text-blue-600 transition">
+                        <i class="fa-solid fa-globe text-lg"></i> <span id="langText">BN</span>
+                    </div>
+                    <div class="relative cursor-pointer text-xl ml-1" onclick="toggleCart()">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center border border-white">0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="px-4 pb-3" id="searchBarContainer">
+                <div class="flex items-center bg-gray-50 rounded-lg p-1 border border-gray-200 focus-within:border-blue-400 transition">
+                    <input type="text" id="searchInput" placeholder="পণ্য খুঁজুন..." class="bg-transparent w-full outline-none px-3 text-sm">
+                    <button class="bg-blue-600 text-white px-4 py-1.5 rounded-md"><i class="fa-solid fa-magnifying-glass"></i></button>
+                </div>
+            </div>
+        </header>
+
+        <!-- 🔥 Adsterra Banner Container 🔥 -->
+        <div id="adsterra-banner-container" class="w-full flex justify-center bg-gray-50 border-b hidden"></div>
+
+        <!-- Categories & Products List -->
+        <div id="mainContentArea">
+            <div class="px-4 py-3 flex gap-3 overflow-x-auto border-b hide-scroll" id="categoryContainer"></div>
+            <div class="px-4 py-3 flex justify-between items-center text-sm text-gray-600">
+                <span id="lang-allProd" class="font-bold text-black">All Products</span>
+                <select class="border border-gray-300 p-1 rounded bg-white outline-none focus:border-blue-500"><option>Default</option></select>
+            </div>
+            <div class="grid grid-cols-2 gap-3 p-4 bg-gray-50" id="productContainer"></div>
+        </div>
+
+        <!-- PRODUCT DETAILS MODAL -->
+        <div id="productModal" class="fixed inset-0 bg-white z-[45] hidden flex-col overflow-y-auto pb-20 w-full max-w-md mx-auto shadow-xl">
+            <button onclick="closeProductModal()" class="absolute top-4 left-4 bg-white/90 w-10 h-10 rounded-full flex justify-center items-center text-black shadow-md z-50 hover:bg-gray-200 transition"><i class="fa-solid fa-arrow-left text-xl"></i></button>
+            
+            <div class="w-full bg-gray-100 flex justify-center items-center overflow-hidden">
+                <img id="pdMainImg" src="" onerror="this.src='https://placehold.co/400x400?text=No+Image'" class="w-full h-80 object-cover shadow-sm transition-opacity duration-300">
+            </div>
+
+            <div class="px-5 mt-4 flex gap-2 overflow-x-auto hide-scroll" id="pdThumbnails"></div>
+
+            <div class="p-5">
+                <h2 id="pdName" class="text-xl font-bold text-black leading-tight mb-2"></h2>
+                
+                <div class="flex items-center gap-3 mb-4">
+                    <span id="pdPrice" class="text-2xl font-bold text-black"></span>
+                    <span id="pdOldPrice" class="text-sm text-gray-500 line-through"></span>
+                    <span id="pdSaveBadge" class="bg-blue-600 text-white text-[11px] font-bold px-2 py-0.5 rounded-full hidden"></span>
+                </div>
+
+                <div id="pdColorSection" class="mb-5 hidden">
+                    <h3 class="text-sm font-bold text-gray-700 mb-2"><span id="lang-colorTxt">Select Color</span> <span class="text-red-500">*</span></h3>
+                    <div class="flex flex-wrap gap-2" id="pdColors"></div>
+                </div>
+
+                <div class="border border-blue-600 rounded-lg flex items-center justify-between p-1 w-max mb-5">
+                    <button onclick="changePdQty(-1)" class="w-10 h-8 text-blue-600 font-bold text-lg">-</button>
+                    <span id="pdQty" class="px-4 font-bold text-black">1</span>
+                    <button onclick="changePdQty(1)" class="w-10 h-8 text-blue-600 font-bold text-lg">+</button>
+                </div>
+
+                <div id="pdActionButtons" class="space-y-3"></div>
+
+                <div class="mt-8 border border-gray-200 rounded-xl p-4 bg-gray-50">
+                    <h3 class="font-bold text-black mb-2 border-b pb-1 text-sm"><span id="lang-detailsTxt">Details:</span></h3>
+                    <div id="pdDesc" class="text-sm text-gray-600 whitespace-pre-wrap leading-relaxed"></div>
+                </div>
+            </div>
+        </div>
+
+        <a id="waFloatBtn" href="#" target="_blank" class="fixed bottom-6 right-4 bg-green-500 text-white w-14 h-14 rounded-full flex justify-center items-center shadow-lg text-3xl z-40 hidden hover:bg-green-600 transition hover:scale-105">
+            <i class="fa-brands fa-whatsapp"></i>
+        </a>
+
+        <!-- Cart Modal -->
+        <div id="cartModal" class="fixed inset-0 bg-black bg-opacity-60 z-[50] hidden flex justify-center items-end">
+            <div class="w-full max-w-md bg-white rounded-t-2xl h-[90vh] overflow-y-auto p-5 relative">
+                <button onclick="toggleCart()" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-2xl"><i class="fa-solid fa-circle-xmark"></i></button>
+                <h2 id="lang-cartTitle" class="text-2xl font-bold mb-4 text-blue-800">অর্ডার করুন</h2>
+                
+                <h3 id="lang-contactTitle" class="text-lg font-bold text-black mb-3">Contact</h3>
+                <div class="mb-5">
+                    <label class="block text-sm font-bold text-gray-700 mb-1"><span id="lang-phoneLabel">আপনার ফোন নাম্বার</span> <span class="text-red-500">*</span></label>
+                    <div class="flex w-full">
+                        <div class="flex items-center gap-2 bg-gray-100 border border-gray-300 border-r-0 rounded-l-lg px-3 py-3"><img src="https://flagcdn.com/w40/bd.png" class="w-5 h-5 rounded-full object-cover border border-gray-300"><span class="text-sm font-bold text-black">(+880)</span></div>
+                        <input type="tel" id="cPhone" class="flex-1 border border-gray-300 rounded-r-lg px-4 py-3 outline-none focus:border-blue-500 transition text-black">
+                    </div>
+                </div>
+
+                <h3 id="lang-personalInfo" class="text-xl font-bold text-black mb-3 border-t pt-4">ব্যক্তিগত তথ্য</h3>
+                <div class="space-y-4 mb-6">
+                    <div><label class="block text-sm font-bold text-gray-700 mb-1"><span id="lang-nameLabel">আপনার নাম</span> <span class="text-red-500">*</span></label><input type="text" id="cName" class="w-full border border-gray-300 p-3 rounded-lg outline-none focus:border-blue-500"></div>
+                    <div><label class="block text-sm font-bold text-gray-700 mb-1"><span id="lang-addressLabel">আপনার ঠিকানা</span> <span class="text-red-500">*</span></label><textarea id="cAddress" class="w-full border border-gray-300 p-3 rounded-lg outline-none focus:border-blue-500" rows="2"></textarea></div>
+                </div>
+
+                <h3 id="lang-payOptTitle" class="text-lg font-bold text-black mb-3 border-t pt-4">পেমেন্ট অপশন</h3>
+                <div class="space-y-3 mb-6">
+                    <label class="flex items-center gap-3 border border-blue-300 bg-blue-50 p-3 rounded-lg cursor-pointer transition relative">
+                        <div class="w-10 h-10 bg-white rounded border flex items-center justify-center text-pink-600 text-xl"><i class="fa-solid fa-mobile-screen-button"></i></div>
+                        <div><span class="font-bold text-black block text-sm">Self MFS</span><span class="text-xs font-bold text-gray-600">mobile financial services</span></div>
+                        <i class="fa-solid fa-circle-check text-blue-600 absolute right-4 text-xl"></i>
+                    </label>
+                </div>
+
+                <h3 id="lang-orderSummaryTitle" class="text-xl font-bold text-black mb-3 border-t pt-4">অর্ডার সামারি</h3>
+                <div id="cartItems" class="space-y-3 mb-4"></div>
+
+                <div class="border border-gray-200 p-3 rounded-xl text-sm space-y-2 bg-gray-50 mb-6 shadow-sm">
+                    <div class="flex justify-between text-gray-600"><span id="lang-subTotal">সাব টোটাল</span><span id="subTotal" class="font-bold text-black">0 BDT</span></div>
+                    <div class="flex justify-between text-gray-600"><span>VAT</span><span id="vatTotal" class="font-bold text-blue-600">0 BDT</span></div>
+                    <div class="flex justify-between text-red-500 font-bold"><span id="lang-delCharge">ডেলিভারি চার্জ</span><span id="delCharge">150 BDT</span></div>
+                    <div class="flex justify-between font-bold text-lg border-t border-gray-300 pt-2 mt-2 text-black"><span id="lang-grandTotal">সর্বমোট</span><span id="grandTotal">0 BDT</span></div>
+                </div>
+
+                <div class="space-y-2 mb-4 bg-gray-50 p-3 border rounded-lg">
+                    <label class="flex items-center gap-3 cursor-pointer"><input type="radio" name="payType" value="full" checked class="w-4 h-4 text-blue-600"> <span id="lang-payFull" class="font-bold text-gray-700 text-sm">পূর্ণ মূল্য পরিশোধ করুন</span></label>
+                    <label class="flex items-center gap-3 cursor-pointer mt-2"><input type="radio" name="payType" value="advance" class="w-4 h-4 text-blue-600"> <span class="font-bold text-gray-700 text-sm"><span id="lang-payAdv">এডভান্স টাকা</span> (<span id="advAmount">150</span> BDT)</span></label>
+                </div>
+
+                <div id="paymentBox" class="border border-red-200 p-4 rounded-xl bg-white mb-5 hidden shadow-sm">
+                    <h4 class="font-bold text-red-600 mb-3 text-sm flex items-center gap-2"><i class="fa-regular fa-square-check text-lg"></i> <span id="lang-payInst">bKash/Nagad payment instruction</span></h4>
+                    <div id="bkashRow" class="flex justify-between items-center hidden mb-2 bg-gray-50 p-2 rounded border"><span class="font-bold text-pink-600 text-sm">bKash: <span id="bNumb" class="font-mono text-black ml-1"></span></span><button onclick="copyNum('bNumb')" class="text-blue-600 bg-blue-100 px-3 py-1 rounded text-xs font-bold">Copy</button></div>
+                    <div id="nagadRow" class="flex justify-between items-center hidden bg-gray-50 p-2 rounded border"><span class="font-bold text-orange-600 text-sm">Nagad: <span id="nNumb" class="font-mono text-black ml-1"></span></span><button onclick="copyNum('nNumb')" class="text-blue-600 bg-blue-100 px-3 py-1 rounded text-xs font-bold">Copy</button></div>
+                    <div class="mt-4 space-y-4 pt-3 border-t border-red-100">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1"><span id="lang-senderLabel">যে নম্বর থেকে টাকা পাঠিয়েছেন</span> <span class="text-red-500">*</span></label>
+                            <div class="flex w-full">
+                                <div class="flex items-center gap-2 bg-gray-100 border border-gray-300 border-r-0 rounded-l-lg px-3 py-3"><img src="https://flagcdn.com/w40/bd.png" class="w-5 h-5 rounded-full object-cover border border-gray-300"><span class="text-sm font-bold text-black">(+880)</span></div>
+                                <input type="tel" id="senderNum" class="flex-1 border border-gray-300 rounded-r-lg px-4 py-3 outline-none focus:border-red-500 transition text-black">
+                            </div>
+                        </div>
+                        <div><label class="block text-sm font-bold text-gray-700 mb-1"><span id="lang-trxLabel">TrxID (ট্রানজেকশন আইডি)</span> <span class="text-red-500">*</span></label><input type="text" id="trxId" class="w-full border border-gray-300 p-3 rounded-lg outline-none focus:border-red-500 text-sm uppercase"></div>
+                    </div>
+                </div>
+
+                <button onclick="submitOrder()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3.5 rounded-xl mt-2 font-bold text-lg mb-4 shadow-lg transition"><i class="fa-solid fa-paper-plane"></i> <span id="lang-confirmBtn">অর্ডার কনফার্ম করুন</span></button>
+            </div>
+        </div>
+
+        <div id="successModal" class="fixed inset-0 bg-black bg-opacity-70 z-[60] hidden flex justify-center items-center">
+            <div class="bg-white rounded-2xl p-8 w-11/12 max-w-sm text-center shadow-2xl transform transition-all">
+                <div class="text-green-500 text-7xl mb-4"><i class="fa-solid fa-circle-check"></i></div>
+                <h2 id="successTitle" class="text-2xl font-bold text-black mb-2">অর্ডার সফল হয়েছে!</h2>
+                <p id="successDesc" class="text-gray-600 text-sm mb-6">আপনার অর্ডারটি সিস্টেমে জমা হয়েছে। হোয়াটসঅ্যাপে নিয়ে যাওয়া হচ্ছে...</p>
+                <div class="flex justify-center"><i class="fa-solid fa-spinner fa-spin text-blue-600 text-3xl"></i></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 🔥 FIRESTORE LOGIC & ADSTERRA INJECTION 🔥 -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, addDoc, doc, getDoc, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBH-6iF4Nh3ctxNQ9uTav4ZJJJPHMTFvkM",
+            authDomain: "sublu-976db.firebaseapp.com",
+            projectId: "sublu-976db",
+            storageBucket: "sublu-976db.firebasestorage.app",
+            messagingSenderId: "646686625121",
+            appId: "1:646686625121:web:9f9ef5fc65526bdb314920"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let products = []; let categories = []; let cart = [];
+        let settings = { delivery: 150, vat: 0, whatsapp: "" };
+        let activeProduct = null; let selectedColor = ""; let activeVariantsData = []; 
+
+        let currentLang = 'bn';
+        const langData = {
+            bn: { search: "পণ্য খুঁজুন...", allProd: "All Products", cartTitle: "অর্ডার করুন", subTotal: "সাব টোটাল", delCharge: "ডেলিভারি চার্জ", grandTotal: "সর্বমোট", contactTitle: "Contact", phoneLabel: "আপনার ফোন নাম্বার", personalInfo: "ব্যক্তিগত তথ্য", nameLabel: "আপনার নাম", addressLabel: "আপনার ঠিকানা", payOptTitle: "পেমেন্ট অপশন", payFull: "পূর্ণ মূল্য পরিশোধ করুন", payAdv: "এডভান্স টাকা", payInst: "বিকাশ/নগদ পেমেন্ট নির্দেশনা", senderLabel: "যে নম্বর থেকে টাকা পাঠিয়েছেন", trxLabel: "TrxID (ট্রানজেকশন আইডি)", confirmBtn: "অর্ডার কনফার্ম করুন", orderNow: "অর্ডার করুন", addCart: "কার্টে যোগ করুন", stockOut: "Stock Out", orderSummaryTitle: "অর্ডার সামারি", successTitle: "অর্ডার সফল হয়েছে!", successDesc: "হোয়াটসঅ্যাপে নিয়ে যাওয়া হচ্ছে...", stockLimit: "দুঃখিত, পর্যাপ্ত পণ্য স্টকে নেই।", colorTxt: "কালার সিলেক্ট করুন", detailsTxt: "বিস্তারিত তথ্য:" },
+            en: { search: "Search...", allProd: "All Products", cartTitle: "Place order", subTotal: "Sub Total", delCharge: "Delivery Charge", grandTotal: "Grand Total", contactTitle: "Contact", phoneLabel: "Phone number", personalInfo: "Personal Info", nameLabel: "Full Name", addressLabel: "Address", payOptTitle: "Payment options", payFull: "Pay Full Amount", payAdv: "Advance Payment", payInst: "Payment instruction", senderLabel: "Sender Phone Number", trxLabel: "TrxID (Transaction ID)", confirmBtn: "Confirm Order", orderNow: "Order Now", addCart: "Add to Cart", stockOut: "Stock Out", orderSummaryTitle: "Order Summary", successTitle: "Order Successful!", successDesc: "Redirecting to WhatsApp...", stockLimit: "Sorry, not enough items in stock.", colorTxt: "Select Color", detailsTxt: "Product Details:" }
+        };
+
+        window.toggleLanguage = () => {
+            currentLang = currentLang === 'bn' ? 'en' : 'bn';
+            document.getElementById('langText').innerText = currentLang.toUpperCase();
+            let d = langData[currentLang];
+            ['searchInput','cPhone','cName','cAddress','senderNum','trxId'].forEach(id => { let el = document.getElementById(id); if(el) { if(id === 'searchInput') el.placeholder = d.search; else if(id === 'cPhone' || id === 'senderNum') el.placeholder = ""; else if(id === 'cName') el.placeholder = d.nameLabel; else if(id === 'cAddress') el.placeholder = d.addressLabel; else if(id === 'trxId') el.placeholder = d.trxLabel; } });
+            ['lang-allProd','lang-cartTitle','lang-subTotal','lang-delCharge','lang-grandTotal','lang-contactTitle','lang-phoneLabel','lang-personalInfo','lang-nameLabel','lang-addressLabel','lang-payOptTitle','lang-payFull','lang-payAdv','lang-payInst','lang-senderLabel','lang-trxLabel','lang-confirmBtn','lang-orderSummaryTitle', 'lang-colorTxt', 'lang-detailsTxt'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).innerText = d[id.replace('lang-', '')]; });
+            renderProducts(products); updateCartUI(); if(activeProduct) openProductModal(activeProduct.id);
+        };
+        
+        // Load Ads From DB
+        async function loadAdsFromFirestore() {
+            try {
+                const adRef = doc(db, "settings", "ad_settings");
+                const adSnap = await getDoc(adRef);
+
+                let defaultBanner = `<script>atOptions={'key':'3988852ddc2607499411d12416076938','format':'iframe','height':50,'width':320,'params':{}};</scr`+`ipt><script src="https://www.highperformanceformat.com/3988852ddc2607499411d12416076938/invoke.js"></scr`+`ipt>`; 
+                let defaultSocial = `<script src="https://pl23792003.profitablecpmratenetwork.com/ac/f5/22/acf5224742b437f1b5583daa1d967138.js"></scr`+`ipt>`; 
+
+                let bCode = defaultBanner;
+                let sCode = defaultSocial;
+
+                if(adSnap.exists()) {
+                    let aData = adSnap.data();
+                    if(aData.bannerAdCode !== undefined) bCode = aData.bannerAdCode;
+                    if(aData.socialBarAdCode !== undefined) sCode = aData.socialBarAdCode;
+                } else {
+                    await setDoc(adRef, { bannerAdCode: bCode, socialBarAdCode: sCode });
+                }
+
+                // Inject Banner
+                if(bCode && bCode !== "OFF") {
+                    const bannerContainer = document.getElementById('adsterra-banner-container');
+                    bannerContainer.classList.remove('hidden');
+                    const iframe = document.createElement('iframe');
+                    iframe.width = 320; iframe.height = 50; iframe.frameBorder = 0; iframe.scrolling = 'no';
+                    bannerContainer.appendChild(iframe);
+                    const docContent = iframe.contentWindow.document;
+                    docContent.open();
+                    docContent.write(`<html><head><style>body{margin:0;padding:0;display:flex;justify-content:center;}</style></head><body>${bCode}</body></html>`);
+                    docContent.close();
+                }
+                
+                // Inject Social Bar safely into DOM
+                if(sCode && sCode !== "OFF") {
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = sCode;
+                    Array.from(tempDiv.childNodes).forEach(node => {
+                        if (node.tagName === 'SCRIPT') {
+                            const script = document.createElement('script');
+                            Array.from(node.attributes).forEach(attr => script.setAttribute(attr.name, attr.value));
+                            if (node.innerHTML) script.innerHTML = node.innerHTML;
+                            document.body.appendChild(script);
+                        }
+                    });
+                }
+            } catch(e) { console.log("Ad Error:", e); }
+        }
+
+        async function loadData() {
+            try {
+                const setDocSnap = await getDoc(doc(db, "settings", "store_settings"));
+                if(setDocSnap.exists()) {
+                    let d = setDocSnap.data();
+                    settings.delivery = Number(d.deliveryCharge) || 150; 
+                    settings.vat = parseFloat(d.vatPercentage) || 0; 
+                    
+                    document.getElementById('headerTitle').innerText = d.siteName || "milonsell.com";
+                    document.getElementById('pageTitleTag').innerText = d.siteName || "Milon Sell BD";
+                    if(d.siteLogo) document.getElementById('headerLogo').src = d.siteLogo;
+
+                    if(d.emailAddress) document.getElementById('headerEmailBtn').href = `mailto:${d.emailAddress}`;
+                    if(d.phoneNumber) document.getElementById('callBtn').href = `tel:${d.phoneNumber.replace(/[^0-9+]/g, '')}`;
+                    
+                    if(d.whatsappNumber && String(d.whatsappNumber).trim() !== "") {
+                        settings.whatsapp = String(d.whatsappNumber).replace(/[^0-9]/g, ''); 
+                        let waBtn = document.getElementById('waFloatBtn');
+                        waBtn.href = `https://wa.me/${settings.whatsapp}`; waBtn.classList.remove('hidden');
+                    }
+
+                    document.getElementById('delCharge').innerText = `${settings.delivery} BDT`;
+                    document.getElementById('advAmount').innerText = settings.delivery;
+
+                    let hasPay = false;
+                    if(d.bkash) { document.getElementById('bNumb').innerText = d.bkash; document.getElementById('bkashRow').classList.remove('hidden'); hasPay = true; }
+                    if(d.nagad) { document.getElementById('nNumb').innerText = d.nagad; document.getElementById('nagadRow').classList.remove('hidden'); hasPay = true; }
+                    if(hasPay) document.getElementById('paymentBox').classList.remove('hidden');
+                }
+
+                const catSnap = await getDocs(collection(db, "categories"));
+                catSnap.forEach(c => { categories.push({id: c.id, ...c.data()}); }); renderCategories();
+
+                const prodSnap = await getDocs(collection(db, "products"));
+                prodSnap.forEach(p => { products.push({id: p.id, ...p.data()}); }); renderProducts(products);
+
+                loadAdsFromFirestore();
+            } catch(e) { console.log(e); }
+        }
+
+        let activeCategoryId = 'all';
+        function renderCategories() {
+            const catCon = document.getElementById('categoryContainer');
+            catCon.innerHTML = ""; 
+            let allBorder = activeCategoryId === 'all' ? 'border-green-500 border-2 shadow-md' : 'border-gray-200 border';
+            let allText = activeCategoryId === 'all' ? 'text-green-600 font-bold' : 'text-gray-800';
+
+            catCon.innerHTML += `
+            <div onclick="filterCat('all')" class="flex flex-col items-center cursor-pointer min-w-[70px]">
+                <div class="w-14 h-14 bg-white ${allBorder} rounded-xl flex items-center justify-center p-2 mb-1 transition-all duration-300">
+                    <img src="https://cdn-icons-png.flaticon.com/512/1162/1162499.png" class="w-full object-contain">
+                </div>
+                <span class="text-[11px] ${allText} truncate w-16 text-center">All</span>
+            </div>`;
+
+            categories.forEach(c => {
+                let catBorder = activeCategoryId === c.id ? 'border-green-500 border-2 shadow-md' : 'border-gray-200 border';
+                let catText = activeCategoryId === c.id ? 'text-green-600 font-bold' : 'text-gray-600 font-medium';
+
+                catCon.innerHTML += `
+                <div onclick="filterCat('${c.id}')" class="flex flex-col items-center cursor-pointer min-w-[70px]">
+                    <div class="w-14 h-14 bg-white ${catBorder} rounded-xl overflow-hidden flex items-center justify-center mb-1 transition-all duration-300">
+                        <img src="${c.imageUrl}" onerror="this.src='https://placehold.co/150x150?text=No+Image'" class="w-full h-full object-cover">
+                    </div>
+                    <span class="text-[11px] truncate w-16 text-center ${catText}">${c.name}</span>
+                </div>`;
+            });
+        }
+
+        function getProductVariants(p) {
+            if(p.variants && p.variants.length > 0) return p.variants;
+            let vars = [];
+            let imgs = p.imageUrls && p.imageUrls.length > 0 ? p.imageUrls : [p.imageUrl || "https://placehold.co/150x150?text=No+Image"];
+            let cols = p.colors || [];
+            if(cols.length > 0) { cols.forEach((c, idx) => { vars.push({ color: c, images: [imgs[idx] || imgs[0]], stock: parseInt(p.stock)||0 }); }); } 
+            else { vars.push({ color: "", images: imgs, stock: parseInt(p.stock)||0 }); }
+            return vars;
+        }
+
+        function renderProducts(items) {
+            const pCon = document.getElementById('productContainer'); pCon.innerHTML = "";
+            items.forEach(p => {
+                let vars = getProductVariants(p);
+                let totalStock = vars.reduce((sum, v) => sum + (parseInt(v.stock)||0), 0);
+                let isOut = totalStock <= 0; let price = parseFloat(p.currentPrice || p.price || 0); 
+                let firstImg = vars[0].images[0] || "https://placehold.co/150x150?text=No+Image";
+                
+                pCon.innerHTML += `
+                <div onclick="openProductModal('${p.id}')" class="bg-white border border-gray-200 rounded-xl p-3 flex flex-col items-center relative shadow-sm hover:shadow-md transition cursor-pointer">
+                    <div class="w-full h-32 flex justify-center items-center mb-2 bg-gray-50 rounded-lg overflow-hidden">
+                        <img src="${firstImg}" onerror="this.src='https://placehold.co/150x150?text=No+Image'" class="h-full object-contain">
+                    </div>
+                    <div class="flex items-center gap-2 text-sm mt-1">
+                        ${p.oldPrice ? `<span class="text-red-400 line-through text-[11px]">Tk ${p.oldPrice}</span>` : ''}
+                        <span class="text-black font-bold">Tk ${price}</span>
+                    </div>
+                    <h3 class="text-xs text-center text-gray-700 mt-1 h-8 overflow-hidden font-medium leading-tight w-full">${p.name}</h3>
+                    ${isOut ? 
+                        `<button disabled class="w-full mt-3 bg-red-50 text-red-500 py-1.5 rounded-lg text-sm font-bold border border-red-100 cursor-not-allowed">${langData[currentLang].stockOut}</button>` : 
+                        `<div class="w-full flex gap-1.5 mt-3">
+                            <button onclick="event.stopPropagation(); addToCart('${p.id}')" class="border border-blue-600 text-blue-600 px-3 py-1.5 rounded-lg text-sm hover:bg-blue-50 transition"><i class="fa-solid fa-cart-plus"></i></button>
+                            <button onclick="event.stopPropagation(); addToCart('${p.id}'); toggleCart();" class="flex-1 bg-blue-600 text-white py-1.5 rounded-lg text-[13px] font-bold shadow hover:bg-blue-700 transition"><i class="fa-solid fa-bolt"></i> ${langData[currentLang].orderNow}</button>
+                        </div>`
+                    }
+                </div>`;
+            });
+        }
+
+        window.filterCat = (id) => {
+            activeCategoryId = id; renderCategories();    
+            if(id === 'all') { renderProducts(products); } 
+            else { renderProducts(products.filter(p => p.categoryId === id)); }
+        };
+
+        document.getElementById('searchInput').addEventListener('input', (e) => renderProducts(products.filter(p => p.name.toLowerCase().includes(e.target.value.toLowerCase()))));
+
+        window.openProductModal = (id) => {
+            activeProduct = products.find(p => p.id === id); if(!activeProduct) return;
+            activeVariantsData = getProductVariants(activeProduct);
+            
+            document.getElementById('pdQty').innerText = "1";
+            document.getElementById('pdName').innerText = activeProduct.name;
+            document.getElementById('pdPrice').innerText = `${activeProduct.currentPrice} BDT`;
+            
+            if(activeProduct.oldPrice) {
+                document.getElementById('pdOldPrice').innerText = `${activeProduct.oldPrice} BDT`;
+                let save = activeProduct.oldPrice - activeProduct.currentPrice;
+                document.getElementById('pdSaveBadge').innerText = currentLang==='bn'?`সেভ ${save} BDT`:`Save ${save} BDT`;
+                document.getElementById('pdSaveBadge').classList.remove('hidden');
+            } else { document.getElementById('pdOldPrice').innerText = ""; document.getElementById('pdSaveBadge').classList.add('hidden'); }
+
+            document.getElementById('pdDesc').innerText = activeProduct.description || (currentLang==='bn' ? "কোনো বিস্তারিত তথ্য নেই।" : "No details available.");
+
+            let allImages = []; activeVariantsData.forEach(v => { if(v.images) allImages = allImages.concat(v.images); });
+            renderThumbnails(allImages);
+
+            let cSec = document.getElementById('pdColorSection');
+            let hasColors = activeVariantsData.some(v => v.color && v.color.trim() !== "");
+            
+            if(hasColors) {
+                cSec.classList.remove('hidden'); let cHtml = "";
+                activeVariantsData.forEach((v, idx) => {
+                    if(v.color) cHtml += `<button onclick="selectColor('${v.color}')" class="color-btn border border-gray-300 px-4 py-1.5 rounded-lg text-sm font-bold bg-white text-gray-700 hover:bg-gray-100 transition">${v.color}</button>`;
+                });
+                document.getElementById('pdColors').innerHTML = cHtml;
+                selectColor(activeVariantsData.find(v => v.color).color); 
+            } else {
+                cSec.classList.add('hidden'); selectedColor = ""; updateActionButtons(activeVariantsData[0]); 
+            }
+
+            document.getElementById('mainContentArea').classList.add('hidden');
+            document.getElementById('searchBarContainer').classList.add('hidden');
+            document.getElementById('productModal').classList.remove('hidden');
+            document.getElementById('productModal').scrollTo(0,0);
+        }
+
+        window.selectColor = (colorName) => {
+            selectedColor = colorName;
+            document.querySelectorAll('.color-btn').forEach(b => {
+                if(b.innerText === colorName) { b.classList.add('bg-blue-600', 'text-white', 'border-blue-600'); b.classList.remove('bg-white', 'text-gray-700'); } 
+                else { b.classList.remove('bg-blue-600', 'text-white', 'border-blue-600'); b.classList.add('bg-white', 'text-gray-700'); }
+            });
+
+            let variant = activeVariantsData.find(v => v.color === colorName);
+            if(variant) {
+                if(variant.images && variant.images.length > 0) { document.getElementById('pdMainImg').src = variant.images[0]; highlightThumbnail(variant.images[0]); }
+                updateActionButtons(variant);
+            }
+        }
+
+        function renderThumbnails(imagesArray) {
+            if(!imagesArray || imagesArray.length === 0) return;
+            document.getElementById('pdMainImg').src = imagesArray[0];
+            let thumbHtml = "";
+            imagesArray.forEach((url, idx) => {
+                thumbHtml += `<img src="${url}" onerror="this.style.display='none'" onclick="document.getElementById('pdMainImg').src='${url}'; highlightThumbnail('${url}')" class="thumb-img w-16 h-16 object-cover rounded-lg border-2 ${idx===0 ? 'border-blue-600' : 'border-gray-200'} cursor-pointer transition bg-white">`;
+            });
+            document.getElementById('pdThumbnails').innerHTML = thumbHtml;
+        }
+
+        window.highlightThumbnail = (url) => {
+            document.querySelectorAll('.thumb-img').forEach(img => {
+                if(img.src === url) { img.classList.add('border-blue-600'); img.classList.remove('border-gray-200'); }
+                else { img.classList.remove('border-blue-600'); img.classList.add('border-gray-200'); }
+            });
+        }
+
+        function updateActionButtons(variant) {
+            let variantStock = parseInt(variant.stock) || 0; let isOut = variantStock <= 0;
+            let btnHtml = isOut 
+                ? `<button disabled class="w-full bg-red-100 text-red-600 py-3 rounded-lg font-bold border border-red-200">${langData[currentLang].stockOut}</button>`
+                : `<button onclick="addModalToCart(false)" class="w-full bg-blue-50 text-blue-700 border border-blue-600 py-3 rounded-lg font-bold transition hover:bg-blue-100">${langData[currentLang].addCart}</button>
+                   <button onclick="addModalToCart(true)" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold shadow-lg transition hover:bg-blue-700">${langData[currentLang].orderNow}</button>`;
+            document.getElementById('pdActionButtons').innerHTML = btnHtml;
+        }
+
+        window.closeProductModal = () => {
+            document.getElementById('productModal').classList.add('hidden');
+            document.getElementById('mainContentArea').classList.remove('hidden');
+            document.getElementById('searchBarContainer').classList.remove('hidden');
+            activeProduct = null;
+        }
+
+        window.changePdQty = (val) => { let q = parseInt(document.getElementById('pdQty').innerText) + val; if(q < 1) q = 1; document.getElementById('pdQty').innerText = q; }
+
+        window.addToCart = (id) => {
+            let p = products.find(p => p.id === id); if(!p) return;
+            let vars = getProductVariants(p); let firstVariant = vars[0]; let currentStock = parseInt(firstVariant.stock) || 0;
+            let cartItemId = p.id + (firstVariant.color ? `-${firstVariant.color}` : '');
+            let existing = cart.find(c => c.cartItemId === cartItemId);
+            let totalReqQty = existing ? existing.qty + 1 : 1;
+
+            if(totalReqQty > currentStock) return alert(langData[currentLang].stockLimit.replace('{q}', currentStock));
+
+            if(existing) existing.qty += 1;
+            else cart.push({ ...p, cartItemId: cartItemId, qty: 1, selectedColor: firstVariant.color, displayImg: firstVariant.images[0] });
+            updateCartUI(); alert(currentLang==='bn'?"কার্টে যুক্ত হয়েছে!":"Added to cart!");
+        }
+
+        window.addModalToCart = (goCheckout) => {
+            let qty = parseInt(document.getElementById('pdQty').innerText);
+            let variant = activeVariantsData.find(v => v.color === selectedColor) || activeVariantsData[0];
+            let currentStock = parseInt(variant.stock) || 0;
+            let cartItemId = activeProduct.id + (selectedColor ? `-${selectedColor}` : '');
+            let existing = cart.find(c => c.cartItemId === cartItemId);
+            let totalReqQty = existing ? existing.qty + qty : qty;
+
+            if(totalReqQty > currentStock) return alert(langData[currentLang].stockLimit.replace('{q}', currentStock));
+
+            if(existing) existing.qty += qty;
+            else cart.push({ ...activeProduct, cartItemId: cartItemId, qty: qty, selectedColor: selectedColor, displayImg: document.getElementById('pdMainImg').src });
+            updateCartUI(); if(goCheckout) { toggleCart(); } else { closeProductModal(); alert(currentLang==='bn'?"কার্টে যুক্ত হয়েছে!":"Added to cart!");}
+        }
+
+        window.updateQty = (cartItemId, change) => {
+            let item = cart.find(c => c.cartItemId === cartItemId);
+            if(item) { 
+                if(change === 1) {
+                    let itemVarData = getProductVariants(item).find(v => v.color === item.selectedColor) || getProductVariants(item)[0];
+                    let currentStock = parseInt(itemVarData.stock) || 0;
+                    if(item.qty + 1 > currentStock) return alert(langData[currentLang].stockLimit.replace('{q}', currentStock));
+                }
+                item.qty += change; if(item.qty <= 0) cart = cart.filter(c => c.cartItemId !== cartItemId); 
+            } 
+            updateCartUI();
+        }
+        
+        window.delItem = (cartItemId) => { cart = cart.filter(c => c.cartItemId !== cartItemId); updateCartUI(); }
+        window.toggleCart = () => { document.getElementById('cartModal').classList.toggle('hidden'); updateCartUI(); }
+        window.copyNum = (id) => { navigator.clipboard.writeText(document.getElementById(id).innerText); alert("Copied!"); }
+
+        function updateCartUI() {
+            document.getElementById('cart-count').innerText = cart.reduce((a,c)=>a+c.qty, 0);
+            let cHtml = "", sub = 0;
+            cart.forEach(c => {
+                let p = parseFloat(c.currentPrice || c.price || 0); sub += (p * c.qty);
+                let colorText = c.selectedColor ? `<span class="text-[10px] font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded ml-1">${c.selectedColor}</span>` : "";
+                cHtml += `<div class="flex items-center gap-3 border border-gray-200 p-2 rounded-xl relative bg-white shadow-sm"><img src="${c.displayImg}" onerror="this.src='https://placehold.co/150x150?text=No+Image'" class="w-16 h-16 object-cover rounded-lg border p-1 bg-gray-50"><div class="flex-1"><h4 class="text-[13px] text-gray-800 pr-6 font-medium leading-tight">${c.name} ${colorText}</h4><p class="text-sm font-bold text-black mt-1">${p} BDT</p><div class="flex items-center border border-gray-300 rounded-lg w-max mt-2 bg-gray-50"><button onclick="updateQty('${c.cartItemId}', -1)" class="px-3 py-1 text-gray-600 font-bold">-</button><span class="px-3 text-[13px] font-bold border-x border-gray-300">${c.qty}</span><button onclick="updateQty('${c.cartItemId}', 1)" class="px-3 py-1 text-gray-600 font-bold">+</button></div></div><button onclick="delItem('${c.cartItemId}')" class="text-red-500 absolute top-2 right-2 bg-red-50 w-8 h-8 rounded-full flex justify-center items-center"><i class="fa-solid fa-trash-can"></i></button></div>`;
+            });
+            document.getElementById('cartItems').innerHTML = cHtml;
+
+            let vatRate = parseFloat(settings.vat) || 0;
+            let vatAmount = parseFloat(((sub * vatRate) / 100).toFixed(2));
+            let delCharge = cart.length > 0 ? parseFloat(settings.delivery) : 0;
+            let total = parseFloat((sub + vatAmount + delCharge).toFixed(2));
+
+            document.getElementById('subTotal').innerText = sub + " BDT";
+            document.getElementById('vatTotal').innerText = `${vatAmount} BDT (${vatRate}%)`; 
+            document.getElementById('delCharge').innerText = delCharge + " BDT";
+            document.getElementById('grandTotal').innerText = total + " BDT";
+        }
+
+        window.submitOrder = async () => {
+            if(cart.length === 0) return alert(currentLang === 'bn' ? "কার্টে পণ্য নেই!" : "Cart is empty!");
+            let rawPhone = document.getElementById('cPhone').value; let phone = rawPhone ? "+880" + rawPhone : ""; 
+            let name = document.getElementById('cName').value; let address = document.getElementById('cAddress').value;
+            let rawSender = document.getElementById('senderNum').value; let senderNum = rawSender ? "+880" + rawSender : ""; 
+            let trxId = document.getElementById('trxId').value; let payType = document.querySelector('input[name="payType"]:checked').value;
+
+            if(!name || !rawPhone || !address || !rawSender || !trxId) return alert(currentLang === 'bn' ? "সব তথ্য সঠিকভাবে দিন।" : "Please fill out all fields.");
+
+            let sub = cart.reduce((a,c)=> a + (parseFloat(c.currentPrice || c.price || 0)*c.qty), 0);
+            let vatRate = parseFloat(settings.vat) || 0; let vatAmount = parseFloat(((sub * vatRate) / 100).toFixed(2));
+            let total = parseFloat((sub + vatAmount + parseFloat(settings.delivery)).toFixed(2));
+
+            let orderData = {
+                customerName: name, phone, address, senderNum, trxId, paymentType: payType,
+                items: cart.map(c => ({ id: c.id, name: c.name, qty: c.qty, price: c.currentPrice, color: c.selectedColor || "" })), 
+                subtotal: sub, vat: vatAmount, delivery: settings.delivery, total: total, timestamp: new Date().toISOString(), status: "Pending"
+            };
+
+            let btn = event.target; btn.innerText = currentLang === 'bn' ? "অপেক্ষা করুন..." : "Processing..."; btn.disabled = true;
+
+            try {
+                await addDoc(collection(db, "orders"), orderData);
+                
+                for(let i=0; i<cart.length; i++) {
+                    let item = cart[i];
+                    let prodRef = doc(db, "products", item.id);
+                    let prodSnap = await getDoc(prodRef);
+                    
+                    if(prodSnap.exists()) {
+                        let pData = prodSnap.data();
+                        let pVariants = getProductVariants(pData);
+                        
+                        let updatedVariants = pVariants.map(v => {
+                            if((v.color || "") === (item.selectedColor || "")) {
+                                let newStock = (parseInt(v.stock) || 0) - item.qty;
+                                return {...v, stock: newStock < 0 ? 0 : newStock};
+                            }
+                            return v;
+                        });
+
+                        let newTotalStock = updatedVariants.reduce((sum, v) => sum + (parseInt(v.stock)||0), 0);
+                        await updateDoc(prodRef, { variants: updatedVariants, stock: newTotalStock }); 
+                    }
+                }
+
+                let itemsList = cart.map(c => `▪️ ${c.name} ${c.selectedColor ? `(${c.selectedColor})` : ''} - ${c.qty} x ${c.currentPrice || c.price || 0} Tk`).join("%0A");
+                let waText = `*🔥 New Order!*%0A%0A*Name:* ${name}%0A*Phone:* ${phone}%0A*Address:* ${address}%0A%0A*Items:*%0A${itemsList}%0A%0A*Total Bill:* ${total} Tk%0A%0A*Payment:* ${payType === 'advance' ? `Advance` : 'Full'}%0A*Sender Number:* ${senderNum}%0A*TrxID:* ${trxId}`;
+                
+                cart = []; updateCartUI(); 
+                document.getElementById('cartModal').classList.add('hidden');
+                document.getElementById('successTitle').innerText = langData[currentLang].successTitle;
+                document.getElementById('successDesc').innerText = langData[currentLang].successDesc;
+                document.getElementById('successModal').classList.remove('hidden');
+
+                setTimeout(() => {
+                    document.getElementById('successModal').classList.add('hidden');
+                    btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> ${langData[currentLang].confirmBtn}`; btn.disabled = false;
+                    if(settings.whatsapp && settings.whatsapp.trim() !== "") { window.location.href = `https://wa.me/${settings.whatsapp}?text=${waText}`; } 
+                    else { window.location.reload(); }
+                }, 800);
+
+            } catch(e) {
+                alert("Error! Please try again.");
+                btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> ${langData[currentLang].confirmBtn}`; btn.disabled = false;
+            }
+        }
+        toggleLanguage(); // Fix translation
+        loadData();
+    </script>
+</body>
+</html>
